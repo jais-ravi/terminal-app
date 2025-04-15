@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     strategy:
-      fail-fast: false 
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
@@ -30,31 +30,7 @@ jobs:
       - name: Rebuild native modules
         run: npm run rebuild
 
-      - name: Build Electron app
+      - name: Build and Publish Electron app
         run: npm run build
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Add this line to pass the token
-
-      # Upload Windows Artifact (.exe)
-      - name: Upload Windows Artifact
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-artifact
-          path: dist/*.exe
-
-      # Upload macOS Artifact (.dmg)
-      - name: Upload macOS Artifact
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-artifact
-          path: dist/*.dmg
-
-      # Upload Linux Artifact (.AppImage)
-      - name: Upload Linux Artifact
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-artifact
-          path: dist/*.AppImage
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Make sure this secret is set in your repo

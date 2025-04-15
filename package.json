@@ -30,6 +30,11 @@
     "directories": {
       "buildResources": "assets"
     },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ],
     "mac": {
       "target": "dmg"
     },
