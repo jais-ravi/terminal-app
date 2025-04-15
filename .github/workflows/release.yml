@@ -4,38 +4,54 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*.*.*'  # Trigger on version tags (e.g., v1.0.0)
-  workflow_dispatch: # Manually trigger the workflow
+  workflow_dispatch:
 
 jobs:
   build:
-    uses: ./github/workflows/build.yml  # Reusable build workflow
-    with:
+    strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
-  upload:
-    runs-on: ubuntu-latest
-    needs: build
+    runs-on: ${{ matrix.os }}
+
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Rebuild native modules
+        run: npm run rebuild
+
+      - name: Build Electron app
+        run: npm run build
+
+      # Upload Windows Artifact (.exe)
       - name: Upload Windows Artifact
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-artifact
-          path: dist/Windows/*.exe
+          path: dist/*.exe
 
+      # Upload macOS Artifact (.dmg)
       - name: Upload macOS Artifact
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-artifact
-          path: dist/macOS/*.dmg
+          path: dist/*.dmg
 
+      # Upload Linux Artifact (.AppImage)
       - name: Upload Linux Artifact
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-artifact
-          path: dist/Linux/*.AppImage
+          path: dist/*.AppImage
