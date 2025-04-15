@@ -18,14 +18,23 @@ function createWindow() {
 
   win.loadFile('index.html');
 
-  // Select shell: WSL for Windows, zsh for macOS, bash for Linux  
-  const shell = os.platform() === 'win32' ? 'wsl' : os.platform() === 'darwin' ? 'zsh' : 'bash';
+  // ✅ Cross-platform shell selection
+  const platform = os.platform();
+  const shell = platform === 'win32'
+    ? 'powershell.exe' // or 'cmd.exe' if preferred
+    : platform === 'darwin'
+      ? 'zsh'
+      : 'bash';
 
+  // ✅ Cross-platform cwd selection
+  const cwd = platform === 'win32' ? process.env.USERPROFILE : process.env.HOME;
+
+  // ✅ Spawn PTY
   ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols: 80,
     rows: 30,
-    cwd: process.env.HOME,
+    cwd,
     env: process.env,
   });
 
