@@ -32,6 +32,8 @@ jobs:
 
       - name: Build Electron app
         run: npm run build
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Add this line to pass the token
 
       # Upload Windows Artifact (.exe)
       - name: Upload Windows Artifact
