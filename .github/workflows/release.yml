@@ -30,7 +30,7 @@ jobs:
       - name: Rebuild native modules
         run: npm run rebuild
 
-      - name: Build and Publish Electron app
-        run: npm run build
+      - name: Build and Publish
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Make sure this secret is set in your repo
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npm run build

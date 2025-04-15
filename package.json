@@ -24,15 +24,16 @@
   "build": {
     "appId": "com.ravi.linux-terminal",
     "productName": "Linux Terminal",
-    "files": [
-      "**/*"
-    ],
     "directories": {
       "buildResources": "assets"
     },
+    "files": [
+      "**/*"
+    ],
     "publish": [
       {
-        "provider": "github"
+        "provider": "github",
+        "releaseType": "release"
       }
     ],
     "mac": {
