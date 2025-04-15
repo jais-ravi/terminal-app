@@ -1,0 +1,43 @@
+{
+  "name": "linux-terminal",
+  "version": "1.0.0",
+  "description": "A cross-platform terminal that runs Linux commands using Electron and node-pty",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "rebuild": "electron-rebuild -f -w node-pty",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "keywords": ["electron", "terminal", "node-pty", "linux", "xterm"],
+  "author": "Ravi Jaiswal",
+  "license": "MIT",
+  "dependencies": {
+    "node-pty": "^1.1.0-beta34",
+    "xterm": "^5.3.0"
+  },
+  "devDependencies": {
+    "electron": "^35.1.5",
+    "electron-builder": "^26.0.12",
+    "electron-rebuild": "^3.2.9"
+  },
+  "build": {
+    "appId": "com.ravi.linux-terminal",
+    "productName": "Linux Terminal",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
