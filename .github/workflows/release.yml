@@ -1,5 +1,4 @@
-# .github/workflows/release.yml
-name: Build Electron App for Windows
+name: Build & Release Electron App
 
 on:
   push:
@@ -7,28 +6,63 @@ on:
       - 'v*'
 
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Set up Node
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
-
       - name: Install dependencies
         run: npm install
-
       - name: Rebuild native modules
         run: npm run rebuild
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+      - name: Build for Windows
+        run: npm run build -- --win
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v3.1.2
         with:
-          name: windows-installer
+          name: windows-artifacts
           path: dist/*.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Rebuild native modules
+        run: npm run rebuild
+      - name: Build for macOS
+        run: npm run build -- --mac
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: macos-artifacts
+          path: |
+            dist/*.dmg
+            dist/*.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Rebuild native modules
+        run: npm run rebuild
+      - name: Build for Linux
+        run: npm run build -- --linux
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: linux-artifacts
+          path: |
+            dist/*.AppImage
+            dist/*.deb
