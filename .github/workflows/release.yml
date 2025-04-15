@@ -3,66 +3,83 @@ name: Build & Release Electron App
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # Triggers on version tag push like v1.0.0
 
 jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3.5.3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: 18
+
       - name: Install dependencies
         run: npm install
+
       - name: Rebuild native modules
         run: npm run rebuild
+
       - name: Build for Windows
-        run: npm run build -- --win
-      - name: Upload Windows Artifacts
+        run: npm run build --win
+
+      - name: Upload Windows Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: windows-artifacts
+          name: windows-artifact
           path: dist/*.exe
 
   build-macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3.5.3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: 18
+
       - name: Install dependencies
         run: npm install
+
       - name: Rebuild native modules
         run: npm run rebuild
+
       - name: Build for macOS
-        run: npm run build -- --mac
-      - name: Upload macOS Artifacts
+        run: npm run build --mac
+
+      - name: Upload macOS Artifact
         uses: actions/upload-artifact@v3.1.2
         with:
-          name: macos-artifacts
-          path: |
-            dist/*.dmg
-            dist/*.zip
+          name: macos-artifact
+          path: dist/*.dmg
 
-  # build-linux:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18
-  #     - name: Install dependencies
-  #       run: npm install
-  #     - name: Rebuild native modules
-  #       run: npm run rebuild
-  #     - name: Build for Linux
-  #       run: npm run build -- --linux
-  #     - name: Upload Linux Artifacts
-  #       uses: actions/upload-artifact@v3.1.2
-  #       with:
-  #         name: linux-artifacts
-  #         path: |
-  #           dist/*.AppImage
-  #           dist/*.deb
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.5.3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Rebuild native modules
+        run: npm run rebuild
+
+      - name: Build for Linux
+        run: npm run build --linux
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: linux-artifact
+          path: dist/*.AppImage
