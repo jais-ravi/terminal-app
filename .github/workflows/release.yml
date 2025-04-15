@@ -4,63 +4,38 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Allows manual triggering of the workflow
+    tags:
+      - 'v*.*.*'  # Trigger on version tags (e.g., v1.0.0)
+  workflow_dispatch: # Manually trigger the workflow
 
 jobs:
   build:
-    strategy:
+    uses: ./github/workflows/build.yml  # Reusable build workflow
+    with:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest] # Build on three different OSes
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
-    runs-on: ${{ matrix.os }} # Runs the job on the OS from the matrix
-
+  upload:
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      # Checkout the code from the repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18 # Use Node.js version 18, adjust as needed
-
-      # Install project dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # Rebuild any native modules (e.g., node-pty)
-      - name: Rebuild native modules
-        run: npm run rebuild
-
-      # Build the Electron app for the current OS
-      - name: Build Electron app
-        run: npm run build
-
-      # Debug: List contents of dist/ directory before upload
-      - name: List contents of dist/
-        run: ls -al dist/ # This will help check if the .dmg file exists
-
-      # Upload Windows Artifact (.exe)
       - name: Upload Windows Artifact
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: windows-artifact
-          path: dist/*.exe # Ensure the .exe file is generated in dist/
+          path: dist/Windows/*.exe
 
-      # Upload macOS Artifact (.dmg)
       - name: Upload macOS Artifact
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: macos-artifact
-          path: dist/*.dmg # Ensure the .dmg file is generated in dist/
+          path: dist/macOS/*.dmg
 
-      # Upload Linux Artifact (.AppImage)
       - name: Upload Linux Artifact
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3
         with:
           name: linux-artifact
-          path: dist/*.AppImage # Ensure the .AppImage file is generated in dist/
+          path: dist/Linux/*.AppImage
