@@ -1,19 +1,25 @@
-name: Build & Release Electron App
+name: Release Build
 
 on:
   push:
-    tags:
-      - 'v*' # Triggers on version tag push like v1.0.0
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3.5.3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3.8.1
+        uses: actions/setup-node@v3
         with:
           node-version: 18
 
@@ -23,62 +29,28 @@ jobs:
       - name: Rebuild native modules
         run: npm run rebuild
 
-      - name: Build for Windows
-        run: npm run build --win
+      - name: Build Electron app
+        run: npm run build
 
+      # Upload Windows Artifact (.exe)
       - name: Upload Windows Artifact
+        if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v3.1.2
         with:
           name: windows-artifact
           path: dist/*.exe
 
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3.5.3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3.8.1
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Rebuild native modules
-        run: npm run rebuild
-
-      - name: Build for macOS
-        run: npm run build --mac
-
+      # Upload macOS Artifact (.dmg)
       - name: Upload macOS Artifact
+        if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v3.1.2
         with:
           name: macos-artifact
           path: dist/*.dmg
 
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3.5.3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3.8.1
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Rebuild native modules
-        run: npm run rebuild
-
-      - name: Build for Linux
-        run: npm run build --linux
-
+      # Upload Linux Artifact (.AppImage)
       - name: Upload Linux Artifact
+        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v3.1.2
         with:
           name: linux-artifact
