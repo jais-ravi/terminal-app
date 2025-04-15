@@ -4,31 +4,36 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest] # Build on three different OSes
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }} # Runs the job on the OS from the matrix
 
     steps:
+      # Checkout the code from the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 18 # Use Node.js version 18, adjust as needed
 
+      # Install project dependencies
       - name: Install dependencies
         run: npm install
 
+      # Rebuild any native modules (e.g., node-pty)
       - name: Rebuild native modules
         run: npm run rebuild
 
+      # Build the Electron app for the current OS
       - name: Build Electron app
         run: npm run build
 
