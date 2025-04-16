@@ -21,14 +21,14 @@ function createWindow() {
   // ✅ Cross-platform shell selection
   const platform = os.platform();
   const shell = platform === 'win32'
-    ? 'powershell.exe' // or 'cmd.exe' if preferred
+    ? process.env.ComSpec || 'cmd.exe'
     : platform === 'darwin'
       ? 'zsh'
       : 'bash';
 
   // ✅ Cross-platform cwd selection
   const cwd = platform === 'win32' ? process.env.USERPROFILE : process.env.HOME;
-
+  
   // ✅ Spawn PTY
   ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
@@ -41,6 +41,14 @@ function createWindow() {
   // Send data from shell to renderer
   ptyProcess.onData(data => {
     win.webContents.send('terminal-output', data);
+  });
+
+  ptyProcess.on('exit', (code, signal) => {
+    console.log(`Shell exited with code ${code}, signal ${signal}`);
+  });
+
+  ptyProcess.on('error', err => {
+    console.error('PTY Error:', err);
   });
 
   // Receive input from renderer
